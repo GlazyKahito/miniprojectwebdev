@@ -1,142 +1,135 @@
-// DOM Elements
-const form = document.querySelector('#exception-form');
+const exceptionForm = document.querySelector('#exception-form');
 const tableBody = document.querySelector('#table-body');
-const filterType = document.querySelector('#filter-type');
-const filterStatus = document.querySelector('#filter-status');
-const openCountEl = document.querySelector('#open-count');
-const resolvedCountEl = document.querySelector('#resolved-count');
-const emptyStateRow = document.querySelector('#empty-state');
+const typeFilter = document.querySelector('#filter-type');
+const statusFilter = document.querySelector('#filter-status');
+const openIssueCount = document.querySelector('#open-count');
+const resolvedIssueCount = document.querySelector('#resolved-count');
+const emptyState = document.querySelector('#empty-state');
 
-// Modal Elements
-const modal = document.getElementById('ticket-modal');
-const closeModalBtn = document.getElementById('close-modal');
+const ticketModal = document.getElementById('ticket-modal');
+const closeModalButton = document.getElementById('close-modal');
 
-// Toast Popup Elements
-const toastPopup = document.getElementById('toast-popup');
-const toastMessage = document.getElementById('toast-message');
-let toastTimeout; // Variable to store timeout so we can reset it
+const toast = document.getElementById('toast-popup');
+const toastText = document.getElementById('toast-message');
+let toastTimer;
 
-// Dynamic Function to Show Toast
 function showToast(message, type = 'success') {
-    // Update text
-    toastMessage.textContent = message;
-    
-    // Reset classes and apply the correct color type
-    toastPopup.className = 'toast-popup'; 
-    toastPopup.classList.add(`toast-${type}`);
-    
-    // Show the popup
-    toastPopup.classList.add('show');
-    
-    // Clear existing timeout if the user clicks multiple actions fast
-    if (toastTimeout) clearTimeout(toastTimeout);
-    
-    // Hide toast automatically after 3 seconds
-    toastTimeout = setTimeout(() => {
-        toastPopup.classList.remove('show');
+    toastText.textContent = message;
+
+    toast.className = 'toast-popup';
+    toast.classList.add(`toast-${type}`);
+    toast.classList.add('show');
+
+    if (toastTimer) {
+        clearTimeout(toastTimer);
+    }
+
+    toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
     }, 3000);
 }
 
-// Generate Badge HTML string based on type/value
 function createBadge(type, value) {
     return `<span class="badge badge-${value}">${value}</span>`;
 }
 
-// Check Empty State
-function checkEmptyState() {
-    const rows = tableBody.querySelectorAll('tr.data-row');
-    let visibleCount = 0;
+function updateEmptyState() {
+    const issueRows = tableBody.querySelectorAll('tr.data-row');
+    let visibleRows = 0;
 
-    rows.forEach(row => {
+    issueRows.forEach(row => {
         if (row.style.display !== 'none') {
-            visibleCount++;
+            visibleRows++;
         }
     });
 
-    if (visibleCount === 0) {
-        emptyStateRow.style.display = '';
+    if (visibleRows === 0) {
+        emptyState.style.display = '';
     } else {
-        emptyStateRow.style.display = 'none';
+        emptyState.style.display = 'none';
     }
 }
 
-// Update Counters
-function updateCounters() {
-    let open = 0;
-    let resolved = 0;
-    
-    const rows = tableBody.querySelectorAll('tr.data-row');
-    rows.forEach(row => {
-        const status = row.dataset.status;
-        if (status === 'Open') open++;
-        if (status === 'Resolved') resolved++;
+function updateIssueCounts() {
+    let openIssues = 0;
+    let resolvedIssues = 0;
+
+    const issueRows = tableBody.querySelectorAll('tr.data-row');
+
+    issueRows.forEach(row => {
+        const currentStatus = row.dataset.status;
+
+        if (currentStatus === 'Open') {
+            openIssues++;
+        }
+
+        if (currentStatus === 'Resolved') {
+            resolvedIssues++;
+        }
     });
 
-    openCountEl.textContent = open;
-    resolvedCountEl.textContent = resolved;
+    openIssueCount.textContent = openIssues;
+    resolvedIssueCount.textContent = resolvedIssues;
 }
 
-// Apply Filters
-function applyFilters() {
-    const selectedType = filterType.value;
-    const selectedStatus = filterStatus.value;
-    
-    const rows = tableBody.querySelectorAll('tr.data-row');
-    
-    rows.forEach(row => {
-        const typeValue = row.dataset.type;
-        const statusValue = row.dataset.status;
-        
-        let typeMatch = (selectedType === 'All' || selectedType === typeValue);
-        let statusMatch = (selectedStatus === 'All' || selectedStatus === statusValue);
-        
-        if (typeMatch && statusMatch) {
+function filterIssues() {
+    const chosenType = typeFilter.value;
+    const chosenStatus = statusFilter.value;
+
+    const issueRows = tableBody.querySelectorAll('tr.data-row');
+
+    issueRows.forEach(row => {
+        const issueType = row.dataset.type;
+        const issueStatus = row.dataset.status;
+
+        const matchesType =
+            chosenType === 'All' || chosenType === issueType;
+
+        const matchesStatus =
+            chosenStatus === 'All' || chosenStatus === issueStatus;
+
+        if (matchesType && matchesStatus) {
             row.style.display = '';
         } else {
             row.style.display = 'none';
         }
     });
 
-    checkEmptyState();
+    updateEmptyState();
 }
 
-// Form Submission Event
-form.addEventListener('submit', function(e) {
-    e.preventDefault();
+exceptionForm.addEventListener('submit', function (event) {
+    event.preventDefault();
 
-    // Read form values and force uppercase on ID
-    const deliveryId = document.querySelector('#delivery-id').value.trim().toUpperCase(); 
+    const deliveryId = document.querySelector('#delivery-id').value.trim().toUpperCase();
     const customerName = document.querySelector('#customer-name').value.trim();
     const issueType = document.querySelector('#issue-type').value;
     const priority = document.querySelector('input[name="priority"]:checked').value;
     const notes = document.querySelector('#notes').value.trim();
-    
-    // Custom JS Regex check to ensure format is strictly DEL-[numbers] (Secondary Validation)
-    const idRegex = /^DEL-\d+$/;
-    if (!idRegex.test(deliveryId)) {
-        alert("Delivery ID must exactly match the format: DEL- followed by numbers (e.g., DEL-1237)");
+
+    const deliveryIdPattern = /^DEL-\d+$/;
+
+    if (!deliveryIdPattern.test(deliveryId)) {
+        alert('Delivery ID must exactly match the format: DEL- followed by numbers (e.g., DEL-1237)');
         return;
     }
 
     if (!deliveryId || !customerName || !issueType || !priority) {
-        alert("Please fill in all required fields.");
+        alert('Please fill in all required fields.');
         return;
     }
 
-    // Create a new table row
-    const tr = document.createElement('tr');
-    tr.classList.add('data-row');
-    
-    // Store all data as HTML dataset attributes (used for filtering AND the View Modal)
-    tr.dataset.deliveryId = deliveryId;
-    tr.dataset.customerName = customerName;
-    tr.dataset.type = issueType;
-    tr.dataset.priority = priority;
-    tr.dataset.status = 'Open';
-    tr.dataset.notes = notes || "No additional notes provided.";
+    const issueRow = document.createElement('tr');
+    issueRow.classList.add('data-row');
 
-    // Build Row HTML mapped with badges and action buttons
-    tr.innerHTML = `
+    issueRow.dataset.deliveryId = deliveryId;
+    issueRow.dataset.customerName = customerName;
+    issueRow.dataset.type = issueType;
+    issueRow.dataset.priority = priority;
+    issueRow.dataset.status = 'Open';
+    issueRow.dataset.notes = notes || 'No additional notes provided.';
+
+    issueRow.innerHTML = `
         <td><strong>${deliveryId}</strong></td>
         <td>${customerName}</td>
         <td>${issueType}</td>
@@ -149,82 +142,78 @@ form.addEventListener('submit', function(e) {
         </td>
     `;
 
-    // Append to body
-    tableBody.appendChild(tr);
-    
-    // Reset Form, re-apply filters, update counters, and show Success Popup
-    form.reset();
-    applyFilters();
-    updateCounters();
-    
-    // Call the new dynamic toast
+    tableBody.appendChild(issueRow);
+
+    exceptionForm.reset();
+    filterIssues();
+    updateIssueCounts();
+
     showToast('Exception submitted successfully!', 'success');
 });
 
-// Event Delegation for Table Row Actions (View, Resolve, Delete)
-tableBody.addEventListener('click', function(e) {
-    const target = e.target;
-    
-    // View Action (Opens Modal)
-    if (target.classList.contains('btn-view')) {
-        const row = target.closest('tr');
-        
-        // Populate Modal Fields using the stored dataset on the row
-        document.getElementById('modal-id').textContent = row.dataset.deliveryId;
-        document.getElementById('modal-name').textContent = row.dataset.customerName;
-        document.getElementById('modal-type').textContent = row.dataset.type;
-        document.getElementById('modal-priority').innerHTML = createBadge('priority', row.dataset.priority);
-        document.getElementById('modal-status').innerHTML = createBadge('status', row.dataset.status);
-        document.getElementById('modal-notes').textContent = row.dataset.notes;
+tableBody.addEventListener('click', function (event) {
+    const clickedElement = event.target;
 
-        // Show Modal
-        modal.style.display = 'flex';
+    if (clickedElement.classList.contains('btn-view')) {
+        const issueRow = clickedElement.closest('tr');
+
+        document.getElementById('modal-id').textContent = issueRow.dataset.deliveryId;
+        document.getElementById('modal-name').textContent = issueRow.dataset.customerName;
+        document.getElementById('modal-type').textContent = issueRow.dataset.type;
+        document.getElementById('modal-priority').innerHTML =
+            createBadge('priority', issueRow.dataset.priority);
+        document.getElementById('modal-status').innerHTML =
+            createBadge('status', issueRow.dataset.status);
+        document.getElementById('modal-notes').textContent =
+            issueRow.dataset.notes;
+
+        ticketModal.style.display = 'flex';
     }
 
-    // Resolve Action
-    if (target.classList.contains('btn-resolve')) {
-        const row = target.closest('tr');
-        const statusCell = row.querySelector('.status-cell');
-        
-        row.dataset.status = 'Resolved';
+    if (clickedElement.classList.contains('btn-resolve')) {
+        const issueRow = clickedElement.closest('tr');
+        const statusCell = issueRow.querySelector('.status-cell');
+
+        issueRow.dataset.status = 'Resolved';
         statusCell.innerHTML = createBadge('status', 'Resolved');
-        row.classList.add('resolved-row');
-        
-        target.disabled = true; // Disable Resolve button
-        
-        applyFilters();
-        updateCounters();
-        
-        // Add resolve toast!
+        issueRow.classList.add('resolved-row');
+
+        clickedElement.disabled = true;
+
+        filterIssues();
+        updateIssueCounts();
+
         showToast('Issue marked as resolved!', 'success');
     }
-    
-    // Delete Action
-    if (target.classList.contains('btn-delete')) {
-        const confirmDelete = confirm("Are you sure you want to delete this record? This action cannot be undone.");
-        if (confirmDelete) {
-            const row = target.closest('tr');
-            row.remove();
-            
-            applyFilters();
-            updateCounters();
-            
-            // Add delete toast!
+
+    if (clickedElement.classList.contains('btn-delete')) {
+        const shouldDelete = confirm(
+            'Are you sure you want to delete this record? This action cannot be undone.'
+        );
+
+        if (shouldDelete) {
+            const issueRow = clickedElement.closest('tr');
+            issueRow.remove();
+
+            filterIssues();
+            updateIssueCounts();
+
             showToast('Record deleted successfully.', 'danger');
         }
     }
 });
 
-// Modal Close Handlers
-closeModalBtn.addEventListener('click', () => modal.style.display = 'none');
-modal.addEventListener('click', (e) => {
-    // Close modal if user clicks outside the modal content box
-    if (e.target === modal) modal.style.display = 'none';
+closeModalButton.addEventListener('click', () => {
+    ticketModal.style.display = 'none';
 });
 
-// Attach Filter Events
-filterType.addEventListener('change', applyFilters);
-filterStatus.addEventListener('change', applyFilters);
+ticketModal.addEventListener('click', (event) => {
+    if (event.target === ticketModal) {
+        ticketModal.style.display = 'none';
+    }
+});
 
-// Initialize Empty State check on load
-checkEmptyState();
+typeFilter.addEventListener('change', filterIssues);
+statusFilter.addEventListener('change', filterIssues);
+
+updateEmptyState();

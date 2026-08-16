@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Delivery Exception Dashboard | GreyAtom Logistics</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+
     <header class="navbar">
         <div class="nav-content">
             <div class="logo-area">
@@ -18,7 +21,7 @@
     </header>
 
     <main class="dashboard-container">
-        <!-- Summary Dashboard -->
+
         <section class="summary-cards">
             <div class="card open-issues">
                 <div class="card-icon blue-icon"></div>
@@ -27,6 +30,7 @@
                     <p id="open-count">0</p>
                 </div>
             </div>
+
             <div class="card resolved-issues">
                 <div class="card-icon green-icon"></div>
                 <div class="card-info">
@@ -37,27 +41,48 @@
         </section>
 
         <div class="content-grid">
-            <!-- Delivery Exception Form -->
+
             <section class="form-section">
                 <div class="section-header">
                     <h2>Report Delivery Issue</h2>
                     <p class="subtitle">Log a new delivery exception here.</p>
                 </div>
-                
+
                 <form id="exception-form">
+
                     <div class="form-group">
-                        <label for="delivery-id">Delivery ID <span class="required">*</span></label>
-                        <!-- Pattern forces strictly DEL- followed by numbers -->
-                        <input type="text" id="delivery-id" required pattern="^DEL-\d+$" title="Format must be DEL- followed by numbers (e.g., DEL-1237)" placeholder="e.g., DEL-1237">
+                        <label for="delivery-id">
+                            Delivery ID <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="delivery-id"
+                            required
+                            pattern="^DEL-\d+$"
+                            title="Format must be DEL- followed by numbers (e.g., DEL-1237)"
+                            placeholder="e.g., DEL-1237"
+                        >
                     </div>
 
                     <div class="form-group">
-                        <label for="customer-name">Customer Name <span class="required">*</span></label>
-                        <input type="text" id="customer-name" required placeholder="e.g., Jane Doe">
+                        <label for="customer-name">
+                            Customer Name <span class="required">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="customer-name"
+                            required
+                            placeholder="e.g., Jane Doe"
+                        >
                     </div>
 
                     <div class="form-group">
-                        <label for="issue-type">Issue Type <span class="required">*</span></label>
+                        <label for="issue-type">
+                            Issue Type <span class="required">*</span>
+                        </label>
+
                         <select id="issue-type" required>
                             <option value="" disabled selected>Select an issue...</option>
                             <option value="Address Not Found">Address Not Found</option>
@@ -68,42 +93,62 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Priority <span class="required">*</span></label>
+                        <label>
+                            Priority <span class="required">*</span>
+                        </label>
+
                         <div class="radio-pill-group">
+
                             <label class="radio-pill">
                                 <input type="radio" name="priority" value="Low" required>
                                 <span>Low</span>
                             </label>
+
                             <label class="radio-pill">
                                 <input type="radio" name="priority" value="Medium">
                                 <span>Medium</span>
                             </label>
+
                             <label class="radio-pill">
                                 <input type="radio" name="priority" value="High">
                                 <span>High</span>
                             </label>
+
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="notes">Notes <span class="optional">(Optional)</span></label>
-                        <textarea id="notes" rows="3" placeholder="Add additional details or context here..."></textarea>
+                        <label for="notes">
+                            Notes <span class="optional">(Optional)</span>
+                        </label>
+
+                        <textarea
+                            id="notes"
+                            rows="3"
+                            placeholder="Add additional details or context here..."
+                        ></textarea>
                     </div>
 
-                    <button type="submit" class="btn-primary">Submit Exception</button>
+                    <button type="submit" class="btn-primary">
+                        Submit Exception
+                    </button>
+
                 </form>
             </section>
 
-            <!-- Exceptions Dashboard -->
             <section class="table-section">
+
                 <div class="table-header">
+
                     <div class="table-title">
                         <h2>Exceptions Dashboard</h2>
                     </div>
-                    
+
                     <div class="filters">
+
                         <div class="filter-group">
                             <label for="filter-type">Type:</label>
+
                             <select id="filter-type">
                                 <option value="All">All Issues</option>
                                 <option value="Address Not Found">Address Not Found</option>
@@ -112,20 +157,24 @@
                                 <option value="Package Damaged">Package Damaged</option>
                             </select>
                         </div>
-                        
+
                         <div class="filter-group">
                             <label for="filter-status">Status:</label>
+
                             <select id="filter-status">
                                 <option value="All">All Statuses</option>
                                 <option value="Open">Open</option>
                                 <option value="Resolved">Resolved</option>
                             </select>
                         </div>
+
                     </div>
                 </div>
 
                 <div class="table-responsive">
+
                     <table id="exceptions-table">
+
                         <thead>
                             <tr>
                                 <th>Delivery ID</th>
@@ -136,8 +185,9 @@
                                 <th>Actions</th>
                             </tr>
                         </thead>
+
                         <tbody id="table-body">
-                            <!-- Empty State -->
+
                             <tr id="empty-state" class="empty-state-row">
                                 <td colspan="6">
                                     <div class="empty-state-content">
@@ -146,66 +196,103 @@
                                     </div>
                                 </td>
                             </tr>
+
                         </tbody>
+
                     </table>
+
                 </div>
             </section>
+
         </div>
     </main>
 
-    <!-- Ticket View Modal -->
     <div id="ticket-modal" class="modal-overlay" style="display: none;">
+
         <div class="modal-content">
+
             <div class="modal-header">
                 <h2>Ticket Details</h2>
                 <button id="close-modal" class="btn-close">&times;</button>
             </div>
+
             <div class="modal-body">
+
                 <div class="detail-group">
                     <span class="detail-label">Delivery ID</span>
                     <strong id="modal-id"></strong>
                 </div>
+
                 <div class="detail-group">
                     <span class="detail-label">Customer Name</span>
                     <span id="modal-name"></span>
                 </div>
+
                 <div class="detail-group">
                     <span class="detail-label">Issue Type</span>
                     <span id="modal-type"></span>
                 </div>
+
                 <div class="detail-group">
                     <span class="detail-label">Priority</span>
                     <span id="modal-priority"></span>
                 </div>
+
                 <div class="detail-group">
                     <span class="detail-label">Status</span>
                     <span id="modal-status"></span>
                 </div>
+
                 <div class="detail-group full-width">
                     <span class="detail-label">Notes</span>
                     <p id="modal-notes" class="notes-box"></p>
                 </div>
+
             </div>
         </div>
     </div>
 
-    <!-- Dynamic Toast Popup -->
     <div id="toast-popup" class="toast-popup toast-success">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-        <span id="toast-message">Exception submitted successfully!</span>
+
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+
+        <span id="toast-message">
+            Exception submitted successfully!
+        </span>
+
     </div>
 
-    <!-- Beautiful Author Footer -->
     <footer class="site-footer">
+
         <div class="footer-pill-container">
+
             <div class="footer-pill">
                 <span class="footer-text">Designed & Developed by</span>
                 <strong class="author-name">Krutik Mhatre</strong>
             </div>
-            <p class="footer-subtext">Frontend Intern Assignment &bull; GreyAtom Logistics</p>
+
+            <p class="footer-subtext">
+                Frontend Intern Assignment &bull; GreyAtom Logistics
+            </p>
+
         </div>
+
     </footer>
 
     <script src="script.js"></script>
+
 </body>
 </html>
